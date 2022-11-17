@@ -1,4 +1,4 @@
-from traffic_simulator import *
+from middleware.traffic_simulator import *
 
 SCALE = 50000
 

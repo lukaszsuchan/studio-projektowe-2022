@@ -1,3 +1,10 @@
+from collections import deque
+from copy import deepcopy
+from scipy.spatial import distance
+import pygame
+import numpy as np
+from random import randint
+from pygame import gfxdraw
 def curve_points(start, end, control, resolution=5):
 	# If curve is a straight line
 	if (start[0] - end[0])*(start[1] - end[1]) == 0:
@@ -39,8 +46,6 @@ def turn_road(start, end, turn_direction, resolution=15):
 	return curve_road(start, end, control, resolution=resolution)
 
 
-from scipy.spatial import distance
-from collections import deque
 
 class Road:
     def __init__(self, start, end):
@@ -98,7 +103,6 @@ class Road:
                     # Stop vehicles in the stop zone
                     self.vehicles[0].stop()
 
-from copy import deepcopy
 
 class Simulation:
     def __init__(self, config={}):
@@ -282,7 +286,6 @@ class Vehicle:
         
 
 
-from numpy.random import randint
 
 class VehicleGenerator:
     def __init__(self, sim, config={}):
@@ -334,7 +337,6 @@ class VehicleGenerator:
             self.upcoming_vehicle = self.generate_vehicle()
 
 
-from pygame import gfxdraw
 
 class Window:
     def __init__(self, sim, config={}):
@@ -663,7 +665,6 @@ class Window:
         # Draw status info
         self.draw_status()
         
-from traffic_simulator import *
 
 SCALE = 50000
 
