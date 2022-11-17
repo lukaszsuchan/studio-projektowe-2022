@@ -9,3 +9,4 @@
 middleware/build/web-cache/*.data
 middleware/build/web-cache/*.head
 middleware/build/web-cache/*.tmpl
+middleware/build/web-cache/*.png
