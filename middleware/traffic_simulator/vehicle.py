@@ -1,4 +1,4 @@
-import numpy as np
+import math
 
 class Vehicle:
     def __init__(self, config={}):
@@ -29,7 +29,7 @@ class Vehicle:
         self.stopped = False
 
     def init_properties(self):
-        self.sqrt_ab = 2*np.sqrt(self.a_max*self.b_max)
+        self.sqrt_ab = 2*math.sqrt(self.a_max*self.b_max)
         self._v_max = self.v_max
 
     def update(self, lead, dt):

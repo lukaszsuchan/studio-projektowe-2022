@@ -1,3 +1,4 @@
+import random
 from .vehicle import Vehicle
 from numpy.random import randint
 
@@ -29,7 +30,7 @@ class VehicleGenerator:
     def generate_vehicle(self):
         """Returns a random vehicle from self.vehicles with random proportions"""
         total = sum(pair[0] for pair in self.vehicles)
-        r = randint(1, total+1)
+        r = random.randint(1, total)
         for (weight, config) in self.vehicles:
             r -= weight
             if r <= 0:
@@ -41,7 +42,7 @@ class VehicleGenerator:
             # If time elasped after last added vehicle is
             # greater than vehicle_period; generate a vehicle
             road = self.sim.roads[self.upcoming_vehicle.path[0]]      
-            if len(road.vehicles) == 0\
+            if len(road.vehicles) == 0 \
                or road.vehicles[-1].x > self.upcoming_vehicle.s0 + self.upcoming_vehicle.l:
                 # If there is space for the generated vehicle; add it
                 self.upcoming_vehicle.time_added = self.sim.t
