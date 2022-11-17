@@ -1,6 +1,6 @@
+import asyncio
+import math
 import pygame
-from pygame import gfxdraw
-import numpy as np
 
 class Window:
     def __init__(self, sim, config={}):
@@ -28,7 +28,7 @@ class Window:
         self.mouse_down = False
 
 
-    def loop(self, loop=None):
+    async def loop(self, loop=None):
         """Shows a window visualizing the simulation and runs the loop function."""
         
         # Create a pygame window
@@ -47,8 +47,6 @@ class Window:
         while running:
             # Update simulation
             if loop: loop(self.sim)
-
-
 
             # Draw simulation
             self.draw()
@@ -85,12 +83,14 @@ class Window:
                         self.offset = ((x2-x1)/self.zoom, (y2-y1)/self.zoom)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouse_down = False
+            await asyncio.sleep(0)
 
-    def run(self, steps_per_update=1):
+    async def run(self, steps_per_update=1):
         """Runs the simulation by updating in every loop."""
         def loop(sim):
             sim.run(steps_per_update)
-        self.loop(loop)
+
+        await self.loop(loop)
 
     def convert(self, x, y=None):
         """Converts simulation coordinates to screen coordinates"""
@@ -121,32 +121,26 @@ class Window:
 
     def line(self, start_pos, end_pos, color):
         """Draws a line."""
-        gfxdraw.line(
-            self.screen,
-            *start_pos,
-            *end_pos,
-            color
-        )
+        # gfxdraw.line(
+        #     self.screen,
+        #     *start_pos,
+        #     *end_pos,
+        #     color
+        # )
 
     def rect(self, pos, size, color):
         """Draws a rectangle."""
-        gfxdraw.rectangle(self.screen, (*pos, *size), color)
+        pygame.draw.rect(self.screen, color, (*pos, *size))
 
     def box(self, pos, size, color):
         """Draws a rectangle."""
-        gfxdraw.box(self.screen, (*pos, *size), color)
+        pygame.draw.rect(self.screen, color, (*pos, *size))
 
     def circle(self, pos, radius, color, filled=True):
-        gfxdraw.aacircle(self.screen, *pos, radius, color)
-        if filled:
-            gfxdraw.filled_circle(self.screen, *pos, radius, color)
-
-
+        pygame.draw.circle(self.screen, color, *pos, radius)
 
     def polygon(self, vertices, color, filled=True):
-        gfxdraw.aapolygon(self.screen, vertices, color)
-        if filled:
-            gfxdraw.filled_polygon(self.screen, vertices, color)
+        pygame.draw.polygon(self.screen, color, vertices)
 
     def rotated_box(self, pos, size, angle=None, cos=None, sin=None, centered=True, color=(0, 0, 255), filled=True):
         """Draws a rectangle center at *pos* with size *size* rotated anti-clockwise by *angle*."""
@@ -154,7 +148,7 @@ class Window:
         l, h = size
 
         if angle:
-            cos, sin = np.cos(angle), np.sin(angle)
+            cos, sin = math.cos(angle), math.sin(angle)
         
         vertex = lambda e1, e2: (
             x + (e1*l*cos + e2*h*sin)/2,
@@ -177,13 +171,13 @@ class Window:
 
     def arrow(self, pos, size, angle=None, cos=None, sin=None, color=(150, 150, 190)):
         if angle:
-            cos, sin = np.cos(angle), np.sin(angle)
+            cos, sin = math.cos(angle), math.sin(angle)
         
         self.rotated_box(
             pos,
             size,
-            cos=(cos - sin) / np.sqrt(2),
-            sin=(cos + sin) / np.sqrt(2),
+            cos=(cos - sin) / math.sqrt(2),
+            sin=(cos + sin) / math.sqrt(2),
             color=color,
             centered=False
         )
@@ -191,8 +185,8 @@ class Window:
         self.rotated_box(
             pos,
             size,
-            cos=(cos + sin) / np.sqrt(2),
-            sin=(sin - cos) / np.sqrt(2),
+            cos=(cos + sin) / math.sqrt(2),
+            sin=(sin - cos) / math.sqrt(2),
             color=color,
             centered=False
         )
@@ -255,9 +249,17 @@ class Window:
             #     centered=False
             # )
 
+            def arange(start, end, step):
+                i = start
+                result = []
+                while i <= end:
+                    result.append(i)
+                    i += step
+                return result
+
             # Draw road arrow
             if road.length > 5: 
-                for i in np.arange(-0.5*road.length, 0.5*road.length, 10):
+                for i in arange(-0.5*road.length, 0.5*road.length, 10):
                     pos = (
                         road.start[0] + (road.length/2 + i + 3) * road.angle_cos,
                         road.start[1] + (road.length/2 + i + 3) * road.angle_sin
@@ -305,12 +307,12 @@ class Window:
                         cos=road.angle_cos, sin=road.angle_sin,
                         color=color)
 
-    def draw_status(self):
-        text_fps = self.text_font.render(f't={self.sim.t:.5}', False, (0, 0, 0))
-        text_frc = self.text_font.render(f'n={self.sim.frame_count}', False, (0, 0, 0))
-        
-        self.screen.blit(text_fps, (0, 0))
-        self.screen.blit(text_frc, (100, 0))
+    # def draw_status(self):
+    #     text_fps = self.text_font.render(f't={self.sim.t:.5}', False, (0, 0, 0))
+    #     text_frc = self.text_font.render(f'n={self.sim.frame_count}', False, (0, 0, 0))
+    #
+    #     self.screen.blit(text_fps, (0, 0))
+    #     self.screen.blit(text_frc, (100, 0))
 
 
     def draw(self):
@@ -327,5 +329,5 @@ class Window:
         self.draw_signals()
 
         # Draw status info
-        self.draw_status()
+        # self.draw_status()
         

@@ -1,10 +1,9 @@
 from collections import deque
 from copy import deepcopy
-from scipy.spatial import distance
+import math
 import pygame
-import numpy as np
-from random import randint
-from pygame import gfxdraw
+import random
+import asyncio
 def curve_points(start, end, control, resolution=5):
 	# If curve is a straight line
 	if (start[0] - end[0])*(start[1] - end[1]) == 0:
@@ -56,8 +55,31 @@ class Road:
 
         self.init_properties()
 
+    def euclidean_distance(self, u, v, p=2, w=None):
+        if p <= 0:
+            raise ValueError("p must be greater than 0")
+        u_v = (u[0] - v[0], u[1] - v[1])
+        if w is not None:
+            if p == 1:
+                root_w = w
+            elif p == 2:
+                # better precision and speed
+                root_w = math.sqrt(w)
+            elif p == math.inf:
+                root_w = (w != 0)
+            else:
+                root_w = math.pow(w, 1 / p)
+            u_v = root_w * u_v
+        dist = 0
+
+        for i in u_v:
+            dist += abs(i) ** 2
+
+        dist = math.sqrt(dist)
+        return dist
+
     def init_properties(self):
-        self.length = distance.euclidean(self.start, self.end)
+        self.length = self.euclidean_distance(self.start, self.end)
         self.angle_sin = (self.end[1]-self.start[1]) / self.length
         self.angle_cos = (self.end[0]-self.start[0]) / self.length
         # self.angle = np.arctan2(self.end[1]-self.start[1], self.end[0]-self.start[0])
@@ -247,7 +269,7 @@ class Vehicle:
         self.stopped = False
 
     def init_properties(self):
-        self.sqrt_ab = 2*np.sqrt(self.a_max*self.b_max)
+        self.sqrt_ab = 2*math.sqrt(self.a_max*self.b_max)
         self._v_max = self.v_max
 
     def update(self, lead, dt):
@@ -315,7 +337,7 @@ class VehicleGenerator:
     def generate_vehicle(self):
         """Returns a random vehicle from self.vehicles with random proportions"""
         total = sum(pair[0] for pair in self.vehicles)
-        r = randint(1, total+1)
+        r = random.randint(1, total)
         for (weight, config) in self.vehicles:
             r -= weight
             if r <= 0:
@@ -327,7 +349,7 @@ class VehicleGenerator:
             # If time elasped after last added vehicle is
             # greater than vehicle_period; generate a vehicle
             road = self.sim.roads[self.upcoming_vehicle.path[0]]      
-            if len(road.vehicles) == 0\
+            if len(road.vehicles) == 0 \
                or road.vehicles[-1].x > self.upcoming_vehicle.s0 + self.upcoming_vehicle.l:
                 # If there is space for the generated vehicle; add it
                 self.upcoming_vehicle.time_added = self.sim.t
@@ -364,7 +386,7 @@ class Window:
         self.mouse_down = False
 
 
-    def loop(self, loop=None):
+    async def loop(self, loop=None):
         """Shows a window visualizing the simulation and runs the loop function."""
         
         # Create a pygame window
@@ -383,8 +405,6 @@ class Window:
         while running:
             # Update simulation
             if loop: loop(self.sim)
-
-
 
             # Draw simulation
             self.draw()
@@ -421,12 +441,14 @@ class Window:
                         self.offset = ((x2-x1)/self.zoom, (y2-y1)/self.zoom)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouse_down = False
+            await asyncio.sleep(0)
 
-    def run(self, steps_per_update=1):
+    async def run(self, steps_per_update=1):
         """Runs the simulation by updating in every loop."""
         def loop(sim):
             sim.run(steps_per_update)
-        self.loop(loop)
+
+        await self.loop(loop)
 
     def convert(self, x, y=None):
         """Converts simulation coordinates to screen coordinates"""
@@ -457,32 +479,26 @@ class Window:
 
     def line(self, start_pos, end_pos, color):
         """Draws a line."""
-        gfxdraw.line(
-            self.screen,
-            *start_pos,
-            *end_pos,
-            color
-        )
+        # gfxdraw.line(
+        #     self.screen,
+        #     *start_pos,
+        #     *end_pos,
+        #     color
+        # )
 
     def rect(self, pos, size, color):
         """Draws a rectangle."""
-        gfxdraw.rectangle(self.screen, (*pos, *size), color)
+        pygame.draw.rect(self.screen, color, (*pos, *size))
 
     def box(self, pos, size, color):
         """Draws a rectangle."""
-        gfxdraw.box(self.screen, (*pos, *size), color)
+        pygame.draw.rect(self.screen, color, (*pos, *size))
 
     def circle(self, pos, radius, color, filled=True):
-        gfxdraw.aacircle(self.screen, *pos, radius, color)
-        if filled:
-            gfxdraw.filled_circle(self.screen, *pos, radius, color)
-
-
+        pygame.draw.circle(self.screen, color, *pos, radius)
 
     def polygon(self, vertices, color, filled=True):
-        gfxdraw.aapolygon(self.screen, vertices, color)
-        if filled:
-            gfxdraw.filled_polygon(self.screen, vertices, color)
+        pygame.draw.polygon(self.screen, color, vertices)
 
     def rotated_box(self, pos, size, angle=None, cos=None, sin=None, centered=True, color=(0, 0, 255), filled=True):
         """Draws a rectangle center at *pos* with size *size* rotated anti-clockwise by *angle*."""
@@ -490,7 +506,7 @@ class Window:
         l, h = size
 
         if angle:
-            cos, sin = np.cos(angle), np.sin(angle)
+            cos, sin = math.cos(angle), math.sin(angle)
         
         vertex = lambda e1, e2: (
             x + (e1*l*cos + e2*h*sin)/2,
@@ -513,13 +529,13 @@ class Window:
 
     def arrow(self, pos, size, angle=None, cos=None, sin=None, color=(150, 150, 190)):
         if angle:
-            cos, sin = np.cos(angle), np.sin(angle)
+            cos, sin = math.cos(angle), math.sin(angle)
         
         self.rotated_box(
             pos,
             size,
-            cos=(cos - sin) / np.sqrt(2),
-            sin=(cos + sin) / np.sqrt(2),
+            cos=(cos - sin) / math.sqrt(2),
+            sin=(cos + sin) / math.sqrt(2),
             color=color,
             centered=False
         )
@@ -527,8 +543,8 @@ class Window:
         self.rotated_box(
             pos,
             size,
-            cos=(cos + sin) / np.sqrt(2),
-            sin=(sin - cos) / np.sqrt(2),
+            cos=(cos + sin) / math.sqrt(2),
+            sin=(sin - cos) / math.sqrt(2),
             color=color,
             centered=False
         )
@@ -591,9 +607,17 @@ class Window:
             #     centered=False
             # )
 
+            def arange(start, end, step):
+                i = start
+                result = []
+                while i <= end:
+                    result.append(i)
+                    i += step
+                return result
+
             # Draw road arrow
             if road.length > 5: 
-                for i in np.arange(-0.5*road.length, 0.5*road.length, 10):
+                for i in arange(-0.5*road.length, 0.5*road.length, 10):
                     pos = (
                         road.start[0] + (road.length/2 + i + 3) * road.angle_cos,
                         road.start[1] + (road.length/2 + i + 3) * road.angle_sin
@@ -641,12 +665,12 @@ class Window:
                         cos=road.angle_cos, sin=road.angle_sin,
                         color=color)
 
-    def draw_status(self):
-        text_fps = self.text_font.render(f't={self.sim.t:.5}', False, (0, 0, 0))
-        text_frc = self.text_font.render(f'n={self.sim.frame_count}', False, (0, 0, 0))
-        
-        self.screen.blit(text_fps, (0, 0))
-        self.screen.blit(text_frc, (100, 0))
+    # def draw_status(self):
+    #     text_fps = self.text_font.render(f't={self.sim.t:.5}', False, (0, 0, 0))
+    #     text_frc = self.text_font.render(f'n={self.sim.frame_count}', False, (0, 0, 0))
+    #
+    #     self.screen.blit(text_fps, (0, 0))
+    #     self.screen.blit(text_frc, (100, 0))
 
 
     def draw(self):
@@ -663,7 +687,7 @@ class Window:
         self.draw_signals()
 
         # Draw status info
-        self.draw_status()
+        # self.draw_status()
         
 
 SCALE = 50000
@@ -827,5 +851,5 @@ sim.create_gen({
 
 win = Window(sim)
 win.zoom = 1.5
-win.run(steps_per_update=5)
+asyncio.run(win.run(steps_per_update=5))
 

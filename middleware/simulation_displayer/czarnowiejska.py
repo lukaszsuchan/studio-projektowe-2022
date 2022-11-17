@@ -161,4 +161,4 @@ sim.create_gen({
 
 win = Window(sim)
 win.zoom = 1.5
-win.run(steps_per_update=5)
+asyncio.run(win.run(steps_per_update=5))

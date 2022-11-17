@@ -1,5 +1,5 @@
-from scipy.spatial import distance
 from collections import deque
+import math
 
 class Road:
     def __init__(self, start, end):
@@ -10,8 +10,31 @@ class Road:
 
         self.init_properties()
 
+    def euclidean_distance(self, u, v, p=2, w=None):
+        if p <= 0:
+            raise ValueError("p must be greater than 0")
+        u_v = (u[0] - v[0], u[1] - v[1])
+        if w is not None:
+            if p == 1:
+                root_w = w
+            elif p == 2:
+                # better precision and speed
+                root_w = math.sqrt(w)
+            elif p == math.inf:
+                root_w = (w != 0)
+            else:
+                root_w = math.pow(w, 1 / p)
+            u_v = root_w * u_v
+        dist = 0
+
+        for i in u_v:
+            dist += abs(i) ** 2
+
+        dist = math.sqrt(dist)
+        return dist
+
     def init_properties(self):
-        self.length = distance.euclidean(self.start, self.end)
+        self.length = self.euclidean_distance(self.start, self.end)
         self.angle_sin = (self.end[1]-self.start[1]) / self.length
         self.angle_cos = (self.end[0]-self.start[0]) / self.length
         # self.angle = np.arctan2(self.end[1]-self.start[1], self.end[0]-self.start[0])
