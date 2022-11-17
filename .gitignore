@@ -5,3 +5,7 @@
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/studio-projektowe-2022.iml
 /.idea/vcs.xml
+
+middleware/build/web-cache/*.data
+middleware/build/web-cache/*.head
+middleware/build/web-cache/*.tmpl
