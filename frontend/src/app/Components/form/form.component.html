@@ -1,0 +1,42 @@
+<div class="form">
+    <div class="left-panel">
+        <div class="form-content" [formGroup]="SimulationForm">
+            <h1 class="form-title">Simulation Params</h1>
+            <input type="text" class="form-input" value="Hour" formControlName="hour">
+            <p class="error"
+                *ngIf="SimulationForm.controls['hour'].hasError('required') && SimulationForm.controls['hour'].touched">
+                Hour is required</p>
+            <p class="error"
+                *ngIf="!SimulationForm.controls['hour'].hasError('required') && SimulationForm.controls['hour'].hasError('pattern') && (SimulationForm.controls['hour'].touched || SimulationForm.controls['hour'].dirty)">
+                Hour has to match HH:MM</p>
+            <br
+                *ngIf="!(SimulationForm.controls['hour'].hasError('required') && SimulationForm.controls['hour'].touched || !SimulationForm.controls['hour'].hasError('required') && SimulationForm.controls['hour'].hasError('pattern') && (SimulationForm.controls['hour'].touched || SimulationForm.controls['hour'].dirty))">
+            <input type="text" class="form-input" value="Weekday" formControlName="weekday">
+            <p class="error"
+                *ngIf="SimulationForm.controls['weekday'].hasError('required') && SimulationForm.controls['weekday'].touched">
+                Weekday is required</p>
+            <br
+                *ngIf="!(SimulationForm.controls['weekday'].hasError('required') && SimulationForm.controls['weekday'].touched)">
+            <input type="text" class="form-input" value="Heavy vehicle percentage"
+                formControlName="heavyVehiclesPercentage">
+            <p class="error"
+                *ngIf="SimulationForm.controls['heavyVehiclesPercentage'].hasError('required') && SimulationForm.controls['heavyVehiclesPercentage'].touched">
+                Heavy vehicles percentage is required</p>
+            <p class="error"
+                *ngIf="!SimulationForm.controls['heavyVehiclesPercentage'].hasError('required') && SimulationForm.controls['heavyVehiclesPercentage'].hasError('pattern') && (SimulationForm.controls['heavyVehiclesPercentage'].touched || SimulationForm.controls['heavyVehiclesPercentage'].dirty)">
+                Heavy vehicles percentage has to be a number from 0 to 100</p>
+            <br
+                *ngIf="!(SimulationForm.controls['heavyVehiclesPercentage'].hasError('required') && SimulationForm.controls['heavyVehiclesPercentage'].touched || !SimulationForm.controls['heavyVehiclesPercentage'].hasError('required') && SimulationForm.controls['heavyVehiclesPercentage'].hasError('pattern') && (SimulationForm.controls['heavyVehiclesPercentage'].touched || SimulationForm.controls['heavyVehiclesPercentage'].dirty))">
+            <div class="report-dialog">
+                <p class="dialog-question">Do you want to get report after simulation?</p>
+                <div class="radio-buttons">
+                    <input type="radio" class="small" id="small" name="size" value="small" checked="checked">
+                    <p>Yes</p>
+                    <input type="radio" class="big" id="big" name="size" value="big">
+                    <p>No</p>
+                </div>
+            </div>
+            <button class="next" (click)="onSubmit()">SUBMIT<i class="fa fa-arrow-right arrow"></i></button>
+        </div>
+    </div>
+</div>
