@@ -10,6 +10,9 @@ import { environment } from 'src/environments/environment';
 })
 export class FormComponent implements OnInit {
 
+  loading = false;
+  simulationUrl = "https://localhost:8000"
+
   constructor(private fb: FormBuilder, private http: HttpClient) { }
 
   ngOnInit(): void {
@@ -21,16 +24,27 @@ export class FormComponent implements OnInit {
     heavyVehiclesPercentage: ['', [Validators.required, Validators.pattern("([0-9]|[1-9][0-9]|100)")]]
   })
 
-  public onSubmit(){
+  public onSubmit(): void{
     if (this.SimulationForm.valid){
-      const dto = {
+      const ParamsDto = {
         hour: this.SimulationForm.get('hour')?.value,
         weekday: this.SimulationForm.get('weekday')?.value,
         heavyVehiclesPercentage: this.SimulationForm.get('heavyVehiclesPercentage')?.value
       };
-      console.log(dto);
-      this.http.post<any>(environment.urlApi, dto).subscribe(response => console.log(response));
+      this.http.post<any>(environment.urlApi + "/setParams", ParamsDto).subscribe(response => console.log(response));
+      this.loading = true;
+      setTimeout(() => {
+        window.location.href = this.simulationUrl;
+    }, 5000);
+    } else {
+      this.markAllAsChecked();
     }
+  }
+
+  private markAllAsChecked(): void{
+    Object.keys(this.SimulationForm.controls).forEach(key => {
+      this.SimulationForm.controls[key].markAsTouched();
+    });
   }
 
 }
