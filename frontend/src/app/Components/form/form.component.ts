@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
 export class FormComponent implements OnInit {
 
   loading = false;
-  simulationUrl = "https://localhost:8000"
+  simulationUrl = "http://localhost:8000"
 
   constructor(private fb: FormBuilder, private http: HttpClient) { }
 
