@@ -7,8 +7,8 @@ import trafficsimulation.restapi.model.request.SimulationParamsRequest;
 import trafficsimulation.restapi.service.ObjectToJsonFile;
 
 
-@AllArgsConstructor
 @RestController
+@AllArgsConstructor
 class Controller implements Endpoints{
 
     private final ObjectToJsonFile objectToJsonFile;

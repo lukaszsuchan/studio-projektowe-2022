@@ -2,14 +2,12 @@ package trafficsimulation.restapi.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.time.DayOfWeek;
+import lombok.NoArgsConstructor;
+import trafficsimulation.restapi.model.SimulationParamsDto;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class SimulationParamsRequest {
-    private int hour;
-    private int minutes;
-    private DayOfWeek dayOfWeek;
-    private int heavyVehiclePercentage;
+   private SimulationParamsDto simulationParams;
 }
