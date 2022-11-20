@@ -5,8 +5,16 @@
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/studio-projektowe-2022.iml
 /.idea/vcs.xml
+/.idea/dataSources.xml
 
 middleware/build/web-cache/*.data
 middleware/build/web-cache/*.head
 middleware/build/web-cache/*.tmpl
 middleware/build/web-cache/*.png
+/rest-api/mvnw
+/rest-api/mvnw.cmd
+/rest-api/.idea
+/rest-api/.mvn
+
+/frontend/node_modules
+/rest-api/target/
