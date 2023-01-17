@@ -15,7 +15,7 @@ class TrafficSignal:
         self.slow_distance = 50
         self.slow_factor = 0.4
         self.stop_distance = 15
-
+        self.cycle_time = 30
         self.current_cycle_index = 0
 
         self.last_t = 0
@@ -28,8 +28,8 @@ class TrafficSignal:
     @property
     def current_cycle(self):
         return self.cycle[self.current_cycle_index]
-    
+
     def update(self, sim):
-        cycle_length = 30
+        cycle_length = self.cycle_time
         k = (sim.t // cycle_length) % 2
         self.current_cycle_index = int(k)
