@@ -99,7 +99,10 @@ class PedestrianGenerator:
 
     def set_default_config(self):
         """Set default configuration"""
-        self.pedestrian_rate = 1
+        f = open("params.txt", "r")
+        params_list = f.read().split("\n")
+        pedestrian_level = int(params_list[2])
+        self.pedestrian_rate = pedestrian_level
         self.pedestrians = [
             (1, {'l': 1, 'v_max': 1, 'path': [2]}),
             (5, {'l': 1, 'v_max': 2, 'path': [0]})
@@ -1169,21 +1172,27 @@ sim.create_pedestrian_crossing((-50 + l2 + l3 + l4 + l5, 68), (RIGHT_SECOND_PART
 def road(a): return range(a, a+15)
 
 
+f = open("params.txt", "r")
+params_list = f.read().split("\n")
+vmax = int(params_list[0])
+bus_vmax = math.ceil(int(params_list[0])/2)
+buses_vehicle_rate = int(params_list[1])
+traffic_level = int(params_list[3])
 
 sim.create_gen({
-    'vehicle_rate': 30,
+    'vehicle_rate': traffic_level,
     'vehicles': [
-        [3, {'path': [0, 1, 2, 3, 4, 5, 6, 7, 8, 22, 29 ,30, 31, 32]}],
-        [1, {'path': [18, *road(48 + 15), 15, 14, 13, 12, 11, 10, 9]}],
-        [3, {'path': [18, *road(48), 8, 21]}],
-        [4, {'path': [28, 27, 26, 25, 23, 17, 16, 15, 14, 13, 12, 11, 10]}]
+        [3, {'path': [0, 1, 2, 3, 4, 5, 6, 7, 8, 22, 29 ,30, 31, 32] , 'v_max':vmax}],
+        [1, {'path': [18, *road(48 + 15), 15, 14, 13, 12, 11, 10, 9] , 'v_max':vmax}],
+        [3, {'path': [18, *road(48), 8, 21] , 'v_max':vmax}],
+        [4, {'path': [28, 27, 26, 25, 23, 17, 16, 15, 14, 13, 12, 11, 10] , 'v_max':vmax}]
     ]}
 )
 
 sim.create_gen({
-    'vehicle_rate': 2,
+    'vehicle_rate': buses_vehicle_rate,
     'vehicles': [
-        [4, {'path': [0, 1, 2, 35, 33, 34, 36, 37, 38, 39, 40,6, 7, 8, 41, 42, 43, 44, 45, 46, 47, 32], 'l': 8, 'v_max': 6}]
+        [4, {'path': [0, 1, 2, 35, 33, 34, 36, 37, 38, 39, 40,6, 7, 8, 41, 42, 43, 44, 45, 46, 47, 32], 'l': 8, 'v_max': bus_vmax}]
     ]}
 )
 

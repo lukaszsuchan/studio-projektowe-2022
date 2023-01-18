@@ -13,7 +13,10 @@ class PedestrianGenerator:
 
     def set_default_config(self):
         """Set default configuration"""
-        self.pedestrian_rate = 1
+        f = open("params.txt", "r")
+        params_list = f.read().split("\n")
+        pedestrian_level = int(params_list[2])
+        self.pedestrian_rate = pedestrian_level
         self.pedestrians = [
             (1, {'l': 1, 'v_max': 1, 'path': [2]}),
             (5, {'l': 1, 'v_max': 2, 'path': [0]})
