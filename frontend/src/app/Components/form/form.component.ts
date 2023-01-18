@@ -1,17 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.css']
 })
+
 export class FormComponent implements OnInit {
 
   loading = false;
-  simulationUrl = "https://localhost:8000"
+  pedestrianLevel = 3
+  trafficLevel = 30
+  simulationUrl = "http://localhost:8000"
 
   constructor(private fb: FormBuilder, private http: HttpClient) { }
 
@@ -19,23 +22,25 @@ export class FormComponent implements OnInit {
   }
 
   SimulationForm = this.fb.group({
-    hour: ['', [Validators.required, Validators.pattern("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")]],
-    weekday: ['', Validators.required],
+    vmax: ['', [Validators.required, Validators.pattern("^([1-9]|10)$")]],
     heavyVehiclesPercentage: ['', [Validators.required, Validators.pattern("([0-9]|[1-9][0-9]|100)")]]
   })
 
   public onSubmit(): void{
-    if (this.SimulationForm.valid){
-      const ParamsDto = {
-        hour: this.SimulationForm.get('hour')?.value,
-        weekday: this.SimulationForm.get('weekday')?.value,
-        heavyVehiclesPercentage: this.SimulationForm.get('heavyVehiclesPercentage')?.value
+    console.log()
+    if (this.SimulationForm.valid){ 
+      let busPerc: number = +this.SimulationForm.get('heavyVehiclesPercentage')?.value;
+      busPerc =  Math.round(busPerc / 100 * this.trafficLevel);
+      const simulationParams = {
+        Vmax: this.SimulationForm.get('vmax')?.value,
+        BusesPercentage: busPerc,
+        PedestrianLevel: this.pedestrianLevel,
+        TrafficLevel: this.trafficLevel
       };
-      this.http.post<any>(environment.urlApi + "/setParams", ParamsDto).subscribe(response => console.log(response));
-      this.loading = true;
+      this.http.post<any>("https://localhost:7090/Simulation/run", simulationParams).subscribe(res => {this.loading = true;
       setTimeout(() => {
         window.location.href = this.simulationUrl;
-    }, 5000);
+    }, 10000);});
     } else {
       this.markAllAsChecked();
     }
@@ -45,6 +50,28 @@ export class FormComponent implements OnInit {
     Object.keys(this.SimulationForm.controls).forEach(key => {
       this.SimulationForm.controls[key].markAsTouched();
     });
+  }
+
+  onPedestrianLevelChange(e: any){
+    if(e.target.value === "small"){
+      this.pedestrianLevel = 1
+    } else if(e.target.value === "medium"){
+      this.pedestrianLevel = 3
+    } else {
+      this.pedestrianLevel = 5
+    }
+    console.log(this.pedestrianLevel)
+  }
+
+  onTrafficLevelChange(e: any){
+    if(e.target.value === "small"){
+      this.trafficLevel = 10
+    } else if(e.target.value === "medium"){
+      this.trafficLevel = 25
+    } else {
+      this.trafficLevel = 35
+    }
+    console.log(this.trafficLevel);
   }
 
 }

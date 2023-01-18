@@ -1,4 +1,6 @@
 traffic_simulator/curve.py
+traffic_simulator/pedestrian_crossing.py
+traffic_simulator/pedestrian_generator.py
 traffic_simulator/road.py
 traffic_simulator/simulation.py
 traffic_simulator/traffic_signal.py

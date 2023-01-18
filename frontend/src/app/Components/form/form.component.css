@@ -53,7 +53,7 @@ div.radio-buttons{
     color: rgb(155, 155, 155);
 }
 
-input.small, input.big{
+input.small, input.medium, input.high{
     width: 5%;
     border: 2px solid green;
     accent-color: rgba(0, 255, 149);

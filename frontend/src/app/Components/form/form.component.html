@@ -2,38 +2,45 @@
     <div class="left-panel">
         <div class="form-content" [formGroup]="SimulationForm">
             <h1 class="form-title">Simulation Params</h1>
-            <input type="text" class="form-input" value="Hour" formControlName="hour">
+            <input type="text" class="form-input" value="Vmax" formControlName="vmax" placeholder="V-MAX">
             <p class="error"
-                *ngIf="SimulationForm.controls['hour'].hasError('required') && SimulationForm.controls['hour'].touched">
-                Hour is required</p>
+                *ngIf="SimulationForm.controls['vmax'].hasError('required') && SimulationForm.controls['vmax'].touched">
+                V-MAX is required</p>
             <p class="error"
-                *ngIf="!SimulationForm.controls['hour'].hasError('required') && SimulationForm.controls['hour'].hasError('pattern') && (SimulationForm.controls['hour'].touched || SimulationForm.controls['hour'].dirty)">
-                Hour has to match HH:MM</p>
+                *ngIf="!SimulationForm.controls['vmax'].hasError('required') && SimulationForm.controls['vmax'].hasError('pattern') && (SimulationForm.controls['vmax'].touched || SimulationForm.controls['vmax'].dirty)">
+                V-MAX has to be number in range 1..10</p>
             <br
-                *ngIf="!(SimulationForm.controls['hour'].hasError('required') && SimulationForm.controls['hour'].touched || !SimulationForm.controls['hour'].hasError('required') && SimulationForm.controls['hour'].hasError('pattern') && (SimulationForm.controls['hour'].touched || SimulationForm.controls['hour'].dirty))">
-            <input type="text" class="form-input" value="Weekday" formControlName="weekday">
-            <p class="error"
-                *ngIf="SimulationForm.controls['weekday'].hasError('required') && SimulationForm.controls['weekday'].touched">
-                Weekday is required</p>
-            <br
-                *ngIf="!(SimulationForm.controls['weekday'].hasError('required') && SimulationForm.controls['weekday'].touched)">
-            <input type="text" class="form-input" value="Heavy vehicle percentage"
+                *ngIf="!(SimulationForm.controls['vmax'].hasError('required') && SimulationForm.controls['vmax'].touched || !SimulationForm.controls['vmax'].hasError('required') && SimulationForm.controls['vmax'].hasError('pattern') && (SimulationForm.controls['vmax'].touched || SimulationForm.controls['vmax'].dirty))">
+            <input type="text" class="form-input" value="Heavy vehicle percentage" placeholder="Buses percentage"
                 formControlName="heavyVehiclesPercentage">
             <p class="error"
                 *ngIf="SimulationForm.controls['heavyVehiclesPercentage'].hasError('required') && SimulationForm.controls['heavyVehiclesPercentage'].touched">
-                Heavy vehicles percentage is required</p>
+                Buses percentage is required</p>
             <p class="error"
                 *ngIf="!SimulationForm.controls['heavyVehiclesPercentage'].hasError('required') && SimulationForm.controls['heavyVehiclesPercentage'].hasError('pattern') && (SimulationForm.controls['heavyVehiclesPercentage'].touched || SimulationForm.controls['heavyVehiclesPercentage'].dirty)">
-                Heavy vehicles percentage has to be a number from 0 to 100</p>
+                Buses percentage has to be a number from 0 to 100</p>
             <br
                 *ngIf="!(SimulationForm.controls['heavyVehiclesPercentage'].hasError('required') && SimulationForm.controls['heavyVehiclesPercentage'].touched || !SimulationForm.controls['heavyVehiclesPercentage'].hasError('required') && SimulationForm.controls['heavyVehiclesPercentage'].hasError('pattern') && (SimulationForm.controls['heavyVehiclesPercentage'].touched || SimulationForm.controls['heavyVehiclesPercentage'].dirty))">
-            <div class="report-dialog">
-                <p class="dialog-question">Do you want to get report after simulation?</p>
+            <div class="pedestrian-level-dialog">
+                <p class="dialog-question">Pedestrian level</p>
                 <div class="radio-buttons">
-                    <input type="radio" class="small" id="small" name="size" value="small" checked="checked">
-                    <p>Yes</p>
-                    <input type="radio" class="big" id="big" name="size" value="big">
-                    <p>No</p>
+                    <input type="radio" class="small" id="small" name="pedestrian-level" value="small" checked="checked" (change)="onPedestrianLevelChange($event)">
+                    <p>Small</p>
+                    <input type="radio" class="medium" id="medium" name="pedestrian-level" value="medium" checked="checked" (change)="onPedestrianLevelChange($event)">
+                    <p>Medium</p>
+                    <input type="radio" class="high" id="high" name="pedestrian-level" value="high" (change)="onPedestrianLevelChange($event)">
+                    <p>High</p>
+                </div>
+            </div>
+            <div class="traffic-level-dialog">
+                <p class="dialog-question">Traffic level</p>
+                <div class="radio-buttons">
+                    <input type="radio" class="small" id="small" name="traffic-level" value="small" (change)="onTrafficLevelChange($event)">
+                    <p>Small</p>
+                    <input type="radio" class="medium" id="medium" name="traffic-level" value="medium" checked="checked" (change)="onTrafficLevelChange($event)">
+                    <p>Medium</p>
+                    <input type="radio" class="high" id="high" name="traffic-level" value="high" (change)="onTrafficLevelChange($event)">
+                    <p>High</p>
                 </div>
             </div>
             <button class="next" (click)="onSubmit()">SUBMIT<i class="fa fa-arrow-right arrow"></i></button>
